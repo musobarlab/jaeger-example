@@ -19,7 +19,7 @@ $ docker-compose up
 
 open Jaeger UI http://127.0.0.1:16686
 
-Start our two Microservices server example
+Start our both Microservices server example
 
 - microservice one
 
