@@ -5,6 +5,12 @@
 
 #### Getting started
 
+Clone this project
+```shell
+$ git clone https://github.com/musobarlab/jaeger-example.git
+$ go get -u
+```
+
 Start Jaeger Agent, Jaeger Collector, Jaeger Query and Storage (we will use Elastic Search) 
 ```shell
 $ docker-compose up -d elasticsearch
