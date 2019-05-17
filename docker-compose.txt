@@ -1,0 +1,83 @@
+version: '3'
+services:
+  jaeger:
+    image: jaegertracing/all-in-one:1.11.0
+    ports:
+      - 5775:5775/udp # accept zipkin.thrift over compact thrift protocol
+      - 6831:6831/udp # accept jaeger.thrift over compact thrift protocol
+      - 6832:6832/udp # accept jaeger.thrift over binary thrift protocol
+      - 5778:5778 # serve configs
+      - 16686:16686 # serve frontend
+      - 14268:14268 # accept jaeger.thrift directly from clients
+      - 14250:14250 # accept model.proto
+    depends_on:
+      - cassandra1
+    links:
+      - cassandra1:cassandra1
+    networks:
+      - web
+    environment:
+      - SPAN_STORAGE_TYPE=cassandra
+      - CASSANDRA_SERVERS=cassandra1:9042
+  # elasticsearch:
+  #   image: docker.elastic.co/elasticsearch/elasticsearch:6.4.2
+  #   container_name: elasticsearch
+  #   environment:
+  #     - cluster.name=docker-cluster
+  #     - bootstrap.memory_lock=true
+  #     - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+  #     - discovery.zen.minimum_master_nodes=2
+  #   ulimits:
+  #     memlock:
+  #       soft: -1
+  #       hard: -1
+  #   volumes:
+  #     - ./data/elasticsearch/esdata1:/usr/share/elasticsearch/data
+  #   ports:
+  #     - "9200:9200"
+  #     - "9300:9300"
+  #   networks:
+  #     - web
+  cassandra1:
+    image: cassandra:latest
+    environment:
+      CASSANDRA_CLUSTER_NAME: "CassandraCluster"
+      CASSANDRA_BROADCAST_ADDRESS: cassandra1
+      CASSANDRA_SEEDS: cassandra1
+      CASSANDRA_DC: DC
+      CASSANDRA_RACK: RACK1
+      CASSANDRA_ENDPOINT_SNITCH: GossipingPropertyFileSnitch
+      MAX_HEAP_SIZE: 300m
+      HEAP_NEWSIZE: 200m
+    ports:
+      - "9042:9042"
+      - "9160:9160"
+      - "7191:7191"
+      - "7000:7000"
+      - "7001:7001"
+    volumes:
+      - ./data/cassandra/node1:/var/lib/cassandra/data
+    networks:
+      - web
+  # cassandra2:
+  #   image: cassandra:latest
+  #   environment:
+  #     CASSANDRA_CLUSTER_NAME: "CassandraCluster"
+  #     CASSANDRA_BROADCAST_ADDRESS: cassandra2
+  #     CASSANDRA_SEEDS: cassandra1
+  #     CASSANDRA_DC: DC
+  #     CASSANDRA_RACK: RACK2
+  #     CASSANDRA_ENDPOINT_SNITCH: GossipingPropertyFileSnitch
+  #     MAX_HEAP_SIZE: 300m
+  #     HEAP_NEWSIZE: 200m
+  #   ports:
+  #     - "9042:9042"
+  #   volumes:
+  #     - ./data/cassandra/node2:/var/lib/cassandra/data
+  #   depends_on:
+  #     - cassandra1
+  #   networks:
+  #     - web
+networks:
+  web:
+    driver: bridge
