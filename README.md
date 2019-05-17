@@ -35,7 +35,7 @@ $ cd servicetwo
 $ go run main.go
 ```
 
-Run our client app
+Run our client app, in this example we will search product with name `Nokia`
 
 ```shell
 $ cd client
