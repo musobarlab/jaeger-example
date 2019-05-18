@@ -15,12 +15,12 @@ func main() {
 	tracer, closer := tracing.Init("consumer", "localhost:5775")
 	defer closer.Close()
 
-	http.Handle("/consume", produceHandler(tracer))
+	http.Handle("/consume", consumeHandler(tracer))
 
 	log.Fatal(http.ListenAndServe(":9002", nil))
 }
 
-func produceHandler(tracer opentracing.Tracer) http.Handler {
+func consumeHandler(tracer opentracing.Tracer) http.Handler {
 	return http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
 
 		if req.Method != "POST" {
